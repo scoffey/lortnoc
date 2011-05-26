@@ -1,9 +1,21 @@
 <?php
 
+// How to run tests: Run this command at the project root:
+// phpunit --include-path src test
+
 require_once 'Lortnoc/Container.php';
 
+/**
+ * Test case for Lortnoc_Container.
+ * 
+ * @author scoffey
+ *
+ */
 class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 	
+	/**
+	 * @covers Lortnoc_Container::__construct
+	 */
 	public function testConstructor() {
 		// this only tests the default constructor; for non-default arguments,
 		// see getComponents and getConfigParams tests
@@ -12,6 +24,9 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEmpty($container->getConfigParams());
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::merge
+	 */
 	public function testMerge() {
 		$container = new Lortnoc_Container();
 		$components = array(
@@ -42,6 +57,9 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 				$container->getConfigParams());
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::dereference
+	 */
 	public function testDereference() {
 		$components = array(
 			'Lortnoc_ContainerTest_DummyClass' => array(
@@ -81,6 +99,9 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $container->dereference($value));
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::escape
+	 */
 	public function testEscape() {
 		$this->assertEquals('quux', Lortnoc_Container::escape('quux'));
 		$this->assertEquals(31, Lortnoc_Container::escape(31));
@@ -108,6 +129,9 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, Lortnoc_Container::escape($value));
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::repr
+	 */
 	public function testRepr() {
 		$this->assertEquals('"quux"', Lortnoc_Container::repr('quux'));
 		$this->assertEquals('31', Lortnoc_Container::repr(31));
@@ -128,12 +152,18 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 				. '"baz":{"quux":"xyzzy"}}', Lortnoc_Container::repr($value));
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::getConfigParams
+	 */
 	public function testGetConfigParams() {
 		$params = array('foo' => 'bar', 'baz' => 42);
 		$container = new Lortnoc_Container(array(), $params);
 		$this->assertEquals($params, $container->getConfigParams());
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::getConfigParam
+	 */
 	public function testGetConfigParam() {
 		$params = array('foo' => 'bar', 'baz' => 42);
 		$container = new Lortnoc_Container(array(), $params);
@@ -143,6 +173,9 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('x', $container->getConfigParam('quux', 'x'));
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::setConfigParam
+	 */
 	public function testSetConfigParam() {
 		$params = array('foo' => 'bar');
 		$container = new Lortnoc_Container(array(), $params);
@@ -154,6 +187,9 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('xuuq', $container->getConfigParam('quux'));
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::getComponents
+	 */
 	public function testGetComponents() {
 		$components = array(
 			'Lortnoc_ContainerTest_DummyClass' => array(
@@ -167,6 +203,9 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($components, $container->getComponents());
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::getComponent
+	 */
 	public function testGetComponent() {
 		$components = array(
 			'Lortnoc_ContainerTest_DummyClass' => array(
@@ -182,6 +221,9 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 				'Lortnoc_ContainerTest_DummyClass'));
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::setComponent
+	 */
 	public function testSetComponent() {
 		$container = new Lortnoc_Container();
 		$instance = new Lortnoc_ContainerTest_DummyClass();
@@ -189,9 +231,12 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 				$instance);
 		$this->assertEquals($instance, $container->getComponent(
 				'Lortnoc_ContainerTest_DummyClass'));
-		$this->assertSame($retval, $container);
+		$this->assertSame($container, $retval);
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::hasComponent
+	 */
 	public function testHasComponent() {
 		$components = array(
 			'Lortnoc_ContainerTest_DummyClass' => array(
@@ -213,6 +258,9 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($container->hasComponent('tmp'));
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::clearComponent
+	 */
 	public function testClearComponent() {
 		$components = array(
 			'Lortnoc_ContainerTest_DummyClass' => array(
@@ -233,8 +281,15 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 				'Lortnoc_ContainerTest_AnotherClass'));
 		$k = $container->getComponent('Lortnoc_ContainerTest_AnotherClass');
 		$this->assertNotSame($i, $k);
+		$this->assertSame($container, $retval);
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::__get
+	 * @covers Lortnoc_Container::__set
+	 * @covers Lortnoc_Container::__isset
+	 * @covers Lortnoc_Container::__unset
+	 */
 	public function testPropertyOverloadingMethods() {
 		$components = array(
 			'Lortnoc_ContainerTest_DummyClass' => array(
@@ -257,65 +312,128 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse(isset($container->test));
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::getInstance
+	 */
 	public function testGetComponentReturningCachedSingleton() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::getInstance
+	 */
 	public function testGetComponentThrowingNotFoundException() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::getInstance
+	 */
 	public function testGetComponentThrowingDependencyLoopException() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::getInstance
+	 */
 	public function testGetComponentThrowingConfigErrorIfNotArray() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::getInstance
+	 */
 	public function testGetComponentReturningComponentByAlias() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::getInstance
+	 */
 	public function testGetComponentReturningComponentAsPrototype() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::cerate
+	 */
 	public function testGetComponentCreatedWithoutArguments() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::createFromFactory
+	 */
 	public function testGetComponentCreatedFromFactory() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::createFromFactory
+	 */
 	public function testGetComponentCreatedFromNonCallableFactory() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::createFromFactory
+	 */
 	public function testGetComponentCreatedFromFactoryWithBadArguments() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::createFromClass
+	 */
 	public function testGetComponentCreatedFromClass() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::createFromClass
+	 */
 	public function testGetComponentCreatedFromNonExistingClass() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::createFromClass
+	 */
 	public function testGetComponentCreatedFromClassWithBadArguments() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::callMethod
+	 */
 	public function testGetComponentWithMethodCalls() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::callMethod
+	 */
 	public function testGetComponentWithMethodCallsThrowingConfigError() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::callMethod
+	 */
 	public function testGetComponentWithMethodCallsThrowingReflectionError() {
 	}
 	
+	/**
+	 * @covers Lortnoc_Container::callMethod
+	 */
 	public function testGetComponentWithMethodCallsWithBadArguments() {
 	}
 	
 }
 
+/**
+ * Helper inner class.
+ *
+ */
 class Lortnoc_ContainerTest_DummyClass {
 }
 
+/**
+ * Helper inner class.
+ *
+ */
 class Lortnoc_ContainerTest_AnotherClass {
 	public $name = __CLASS__;
 }
 
+/**
+ * Helper inner class.
+ *
+ */
 class Lortnoc_ContainerTest_YetAnotherClass {
 }
