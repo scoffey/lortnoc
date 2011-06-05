@@ -10,7 +10,7 @@ What is inversion of control?
 
 Dependency injection eliminates the need to hard-code component implementations with creational code inside methods (that is, statements that create new instances). In this way, instead of instantiating a particular implementation of a dependent component, the main component only needs to provide a way to inject it, for example via the constructor or a setter method (no need to implement interfaces or depend upon the DI container). The implementation of the dependent component can then be changed seamlessly in the component dependency configuration of the application.
 
-_Lortnoc_ framework also supports configuration parameters to be passed to the DI container in order to separate behavior from configuration too. By decoupling both dependency resolution and configuration from component behavior, it maximizes the configurability, modularity and reusability of components.
+In order to separate behavior from configuration too, _Lortnoc_ framework also supports configuration parameters to be passed to the DI container. By decoupling both dependency resolution and configuration from component behavior, it encourages optimal configurability, modularity and reusability of components.
 
 For an in-depth explanation, read Martin Fowler's article on [Inversion of Control Containers and the Dependency Injection pattern][3].
 
@@ -25,7 +25,7 @@ DI container features
 - Supports constructor injection by configuring component instantiation (by class name or factory method) with its corresponding arguments.
 - Supports setter injection by configuring methods to be called after components are instantiated.
 - Same conventions in the configuration of arguments for constructor, factory method and setter method calls.
-- Simple syntax to include references to other components (strings starting with '@') or configuration parameters (strings starting with '%') among arguments.
+- Simple syntax to include references to other components (strings starting with `'@'`) or configuration parameters (strings starting with `'%'`) among arguments.
 - Supports 3 scope types: singleton (internally cached instances), prototype (new instance created on every retrieval) or alias (reuses component configuration with different name).
 - Configuration can be built upon arrays and scalars (boolean, integer, float and string). It does not need anonymous functions, instantiated objects and pre-loaded classes.
 - Configuration data may be loaded directly from a PHP file or else data files in other format, like xml, yaml, ini, json, etc. (This configuration loading utility is not provided by the DI container.)
@@ -36,6 +36,8 @@ How to configure a DI container
 Learn by example:
 
 ```php
+<?php
+
 $components = array(
 	'Chin' => array(), // implicit class name ('Chin'), no arguments
 	'Mouth' => array(
@@ -77,8 +79,44 @@ $hair = $container->Hair; // returns a singleton created as in: new WavyHair('br
 $leftEye = $container->LeftEye; // returns a singleton created as in: new Eye('green');
 $rightEye = $container->RightEye; // returns a singleton created as in: new Eye('green');
 $nose = $container->Nose; // returns a singleton created as in: RegularNose::createFromTemplate(2);
-$face = $container->Face; // returns a singleton created as in: new RoundFace(0xEFD0CF, $container->LeftEye, $container->RightEye, $container->Nose, $container->Mouth, $container->Chin);
+$face = $container->Face; // returns a singleton created as in: new RoundFace(0xEFD0CF,
+                          // $container->LeftEye, $container->RightEye, $container->Nose,
+                          // $container->Mouth, $container->Chin);
 ```
+
+FAQ
+---
+
+- What kind of exceptions can be thrown when getting a component?
+    - `Lortnoc_Exception_ConfigError` if component configuration is detected as sintactically or semantically invalid
+    - `Lortnoc_Exception_NotFound` if no such component is configured in the container
+    - `Lortnoc_Exception_ReflectionError` if component cannot be created by reflection
+    - `Lortnoc_Exception_DependencyLoop` if a circular dependency is detected
+
+- Can I configure a component _not_ to be a singleton?
+Yes. You can set the scope to 'prototype', which means that every time the component is retrieved, a new instance will be created. This is valid for any creation strategy, either by constructor or factory method.
+
+- Can I have different names for the same component configuration?
+Yes. You can set an 'alias' to reuse a component configuration with another name.
+
+- How can a inject dependencies after instance construction?
+You can configure setter methods to inject other components that the main component depends on, as well as to setup the component with other initialization parameters not available by constructor.
+
+- How can I reference another component in the list of arguments?
+Prepend its name with `'@'`. For example: `'@Controller'` references component identified by `'Controller'`.
+
+- How can I reference a configuration parameter in the list of arguments?
+Prepend its name with `'%'`. For example: `'%color'` references configuration parameter identified by `'color'`.
+
+- How can I escape strings in the list of arguments that start with special characters (`'@'` or `'%'`)?
+Repeat the special character in order to escape them. For example: `'%%color'` stand for the string `'%color'` and `'@@Controller'` stands for the string `'@Controller'`.
+
+- How can I prepare runtime-dependent values for the list of arguments of a constructor or factory method?
+The DI container does not support pre-calculations. The best way to achieve this is to implement a factory method or function that is able to prepare such values and return the target component, given the corresponding components and configuration parameters.
+
+- Do argument list support keywords (associative arrays)?
+Yes. But keys are ignored. Only values are taken, in the same order.
+
 
 More examples yet to be documented
 ----------------------------------
