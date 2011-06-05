@@ -6,7 +6,8 @@
  * @author scoffey
  *
  */
-class Lortnoc_Exception extends Exception {
+class Lortnoc_Exception extends Exception
+{
 }
 
 /**
@@ -14,14 +15,16 @@ class Lortnoc_Exception extends Exception {
  * semantically).
  *
  */
-class Lortnoc_Exception_ConfigError extends Lortnoc_Exception {
+class Lortnoc_Exception_ConfigError extends Lortnoc_Exception
+{
 }
 
 /**
  * Exception thrown when a component is not found in a DI container.
  *
  */
-class Lortnoc_Exception_NotFound extends Lortnoc_Exception {
+class Lortnoc_Exception_NotFound extends Lortnoc_Exception
+{
 }
 
 /**
@@ -29,12 +32,14 @@ class Lortnoc_Exception_NotFound extends Lortnoc_Exception {
  * or when a method or function cannot be called by reflection.
  *
  */
-class Lortnoc_Exception_ReflectionError extends Lortnoc_Exception {
+class Lortnoc_Exception_ReflectionError extends Lortnoc_Exception
+{
 }
 
 /**
  * Exception thrown when a dependency loop is detected between components.
  *
  */
-class Lortnoc_Exception_DependencyLoop extends Lortnoc_Exception {
+class Lortnoc_Exception_DependencyLoop extends Lortnoc_Exception
+{
 }
