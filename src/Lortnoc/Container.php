@@ -337,9 +337,9 @@ class Lortnoc_Container
     protected function getComponentConfiguration($name) {
         $conf = $this->components[$name];
         if (is_null($conf)) {
-        	$conf = array();
+            $conf = array();
         } else if (is_string($conf)) {
-        	$conf = array('class' => $conf);
+            $conf = array('class' => $conf);
         } else if (!is_array($conf)) {
             throw new Lortnoc_Exception_ConfigError('Component configuration '
                     . 'is not an array: ' . self::repr($conf));
@@ -377,16 +377,18 @@ class Lortnoc_Container
             $instance = $this->createFromClass($class, $arguments);
         }
         
-        $properties = (array_key_exists('properties', $conf)
-                ? $this->dereference($conf['properties']) : array());
-        foreach ($properties as $key => $value) {
-            $instance->$key = $value;
+        if (array_key_exists('properties', $conf)) {
+            $properties = $this->dereference($conf['properties']);
+            foreach ($properties as $key => $value) {
+                $instance->$key = $value;
+            }
         }
         
-        $methods = (array_key_exists('methods', $conf)
-                ? $conf['methods'] : array());
-        foreach ($methods as $conf) {
-            $this->callMethod($instance, $conf);
+        if (array_key_exists('methods', $conf)) {
+            $methods = $conf['methods'];
+            foreach ($methods as $method) {
+                $this->callMethod($instance, $method);
+            }
         }
 
         return $instance;
