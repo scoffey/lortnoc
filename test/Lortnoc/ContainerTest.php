@@ -572,24 +572,86 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
      * @covers Lortnoc_Container::callMethod
      */
     public function testGetComponentWithMethodCalls() {
+    	$params = array('foo' => 3);
+        $components = array(
+            'bar' => array(
+                'class' => 'Lortnoc_ContainerTest_Delta',
+                'arguments' => array(4, 5),
+            ),
+            'Lortnoc_ContainerTest_Zeta' => array(
+                'class' => 'Lortnoc_ContainerTest_Zeta',
+                'arguments' => array(),
+                'methods' => array(
+                    array('method' => 'reset'),
+                    array('method' => 'append', 'arguments' => array(1)),
+                    array('method' => 'reset'),
+                    array('method' => 'append', 'arguments' => array(2)),
+                    array('method' => 'append', 'arguments' => array('%foo')),
+                    array('method' => 'append', 'arguments' => array('@bar')),
+                ),
+            ),
+        );
+        $container = new Lortnoc_Container($components, $params);
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Zeta');
+        $expected = array(2, 3, $container->getComponent('bar'));
+        $this->assertEquals($expected, $instance->a);
     }
     
     /**
      * @covers Lortnoc_Container::callMethod
      */
     public function testGetComponentWithMethodCallsThrowingConfigError() {
+        $components = array(
+            'Lortnoc_ContainerTest_Zeta' => array(
+                'class' => 'Lortnoc_ContainerTest_Zeta',
+                'arguments' => array(),
+                'methods' => array(
+                    array('arguments' => array(1)),
+                ),
+            ),
+        );
+        $container = new Lortnoc_Container($components);
+        $this->setExpectedException('Lortnoc_Exception_ConfigError',
+                'Missing method in: {"arguments":[1]}');
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Zeta');
     }
     
     /**
      * @covers Lortnoc_Container::callMethod
      */
     public function testGetComponentWithMethodCallsThrowingReflectionError() {
+        $components = array(
+            'Lortnoc_ContainerTest_Zeta' => array(
+                'class' => 'Lortnoc_ContainerTest_Zeta',
+                'arguments' => array(),
+                'methods' => array(
+                    array('method' => 'nonexistent', 'arguments' => array()),
+                ),
+            ),
+        );
+        $container = new Lortnoc_Container($components);
+        $this->setExpectedException('Lortnoc_Exception_ReflectionError',
+                'Cannot call method by reflection: Method '
+                . 'Lortnoc_ContainerTest_Zeta::nonexistent() does not exist');
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Zeta');
     }
     
     /**
      * @covers Lortnoc_Container::callMethod
      */
     public function testGetComponentWithMethodCallsWithBadArguments() {
+        $components = array(
+            'Lortnoc_ContainerTest_Zeta' => array(
+                'class' => 'Lortnoc_ContainerTest_Zeta',
+                'arguments' => array(),
+                'methods' => array(
+                    array('method' => 'append', 'arguments' => array()),
+                ),
+            ),
+        );
+        $container = new Lortnoc_Container($components);
+        $this->setExpectedException('Exception'); // due to missing arguments
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Zeta');
     }
     
 }
@@ -674,6 +736,12 @@ class Lortnoc_ContainerTest_Zeta
     public function make() {
         $class = get_called_class();
         return new $class($this->a, $this->b, $this->c);
+    }
+    public function reset() {
+        $this->a = array();
+    }
+    public function append($item) {
+        $this->a[] = $item;
     }
 }
 
