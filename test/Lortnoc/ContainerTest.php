@@ -317,6 +317,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
      * @covers Lortnoc_Container::getInstance
      */
     public function testGetComponentReturningCachedSingleton() {
+        // Also tests creation with no arguments
         $components = array(
             'Lortnoc_ContainerTest_Beta' => array(
                 'class' => 'Lortnoc_ContainerTest_Beta',
@@ -376,7 +377,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
      * @covers Lortnoc_Container::getInstance
      */
     public function testGetComponentThrowingConfigErrorIfNotArray() {
-    	// Also tests other possible configuration types (NULL and string)
+        // Also tests other possible configuration types (NULL and string)
         $components = array(
             'Lortnoc_ContainerTest_Alpha' => NULL,
             'beta' => 'Lortnoc_ContainerTest_Beta',
@@ -433,51 +434,138 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Lortnoc_Container::create
-     */
-    public function testGetComponentCreatedWithoutArguments() {
-    }
-    
-    /**
      * @covers Lortnoc_Container::createFromFactory
      */
     public function testGetComponentCreatedFromFactory() {
+    	$instance = new Lortnoc_ContainerTest_Zeta(14, 15, 16);
+        $components = array(
+            'byClassMethod' => array(
+                'factory' => array('Lortnoc_ContainerTest_Zeta', 'create'),
+                'arguments' => array(4, 5, 6),
+            ),
+            'byInstanceMethod' => array(
+                'factory' => array($instance, 'make'),
+                'arguments' => array(),
+            ),
+            'byLambdaFunction' => array(
+                'factory' => function ($a, $b, $c) {
+                    return new Lortnoc_ContainerTest_Zeta($a, $b, $c);
+                },
+                'arguments' => array(7, 8, 9),
+            ),
+            'byFunction' => array(
+                'factory' => '_testFactoryFunction',
+                'arguments' => array(11, 12, 13),
+            ),
+        );
+        $container = new Lortnoc_Container($components);
+        $instance = $container->getComponent('byClassMethod');
+        $this->assertEquals(new Lortnoc_ContainerTest_Zeta(4, 5, 6),
+                $instance);
+        $instance = $container->getComponent('byInstanceMethod');
+        $this->assertEquals(new Lortnoc_ContainerTest_Zeta(14, 15, 16),
+                $instance);
+        $instance = $container->getComponent('byLambdaFunction');
+        $this->assertEquals(new Lortnoc_ContainerTest_Zeta(7, 8, 9),
+                $instance);
+        $instance = $container->getComponent('byFunction');
+        $this->assertEquals(new Lortnoc_ContainerTest_Zeta(11, 12, 13),
+                $instance);
     }
     
     /**
      * @covers Lortnoc_Container::createFromFactory
      */
     public function testGetComponentCreatedFromNonCallableFactory() {
+    	$badFactory = array('Lortnoc_ContainerTest_Zeta', 'create', 'x');
+        $components = array(
+            'Lortnoc_ContainerTest_Zeta' => array(
+                'factory' => $badFactory,
+                'arguments' => array(4, 5, 6),
+            ),
+        );
+        $container = new Lortnoc_Container($components);
+        $this->setExpectedException('Lortnoc_Exception_ConfigError',
+                'Factory is not callable: ' . json_encode($badFactory));
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Zeta');
     }
     
     /**
      * @covers Lortnoc_Container::createFromFactory
      */
     public function testGetComponentCreatedFromFactoryWithBadArguments() {
+        $components = array(
+            'Lortnoc_ContainerTest_Zeta' => array(
+                'factory' => array('Lortnoc_ContainerTest_Zeta', 'create'),
+                'arguments' => array(),
+            ),
+        );
+        $container = new Lortnoc_Container($components);
+        $this->setExpectedException('Exception'); // due to missing arguments
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Zeta');
     }
     
     /**
      * @covers Lortnoc_Container::createFromClass
      */
     public function testGetComponentCreatedFromClass() {
-    }
-    
-    /**
-     * @covers Lortnoc_Container::createFromClass
-     */
-    public function testGetComponentCreatedFromNonExistingClass() {
+    	// Also tests exception thrown when class is not found
+        $components = array(
+            'Lortnoc_ContainerTest_Epsilon' => array(
+                'class' => 'Lortnoc_ContainerTest_Epsilon',
+                'arguments' => array(1, 2, 3),
+            ),
+            'Lortnoc_ContainerTest_Aleph' => array(
+                'class' => 'Lortnoc_ContainerTest_Aleph',
+                'arguments' => array(1, 2, 3),
+            ),
+        );
+        $container = new Lortnoc_Container($components);
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Epsilon');
+        $this->assertEquals(new Lortnoc_ContainerTest_Epsilon(1, 2, 3),
+                $instance);
+        $this->setExpectedException('Lortnoc_Exception_ReflectionError',
+                'Class not found: "Lortnoc_ContainerTest_Aleph"');
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Aleph');
     }
     
     /**
      * @covers Lortnoc_Container::createFromClass
      */
     public function testGetComponentCreatedFromClassWithBadArguments() {
+        $components = array(
+            'Lortnoc_ContainerTest_Epsilon' => array(
+                'class' => 'Lortnoc_ContainerTest_Epsilon',
+                'arguments' => array(1),
+            ),
+        );
+        $container = new Lortnoc_Container($components);
+        $this->setExpectedException('Exception'); // due to missing arguments
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Epsilon');
     }
     
     /**
      * @covers Lortnoc_Container::create
      */
     public function testGetComponentWithPropertiesSet() {
+    	$params = array('spam' => 'eggs');
+    	$properties = array('a' => 'foo', 'b' => '%spam', 'c' => '@delta');
+        $components = array(
+            'delta' => array(
+                'class' => 'Lortnoc_ContainerTest_Delta',
+                'arguments' => array(4, 5),
+            ),
+            'Lortnoc_ContainerTest_Epsilon' => array(
+                'class' => 'Lortnoc_ContainerTest_Epsilon',
+                'arguments' => array(1, 2, 3),
+                'properties' => $properties,
+            ),
+        );
+        $container = new Lortnoc_Container($components, $params);
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Epsilon');
+        $expected = new Lortnoc_ContainerTest_Epsilon('foo', 'eggs',
+                $container->getComponent('delta'));
+        $this->assertEquals($expected, $instance);
     }
     
     /**
@@ -530,7 +618,7 @@ class Lortnoc_ContainerTest_Beta
 class Lortnoc_ContainerTest_Gamma
 {
     public $a;
-    public function __constructor($a) {
+    public function __construct($a) {
         $this->a = $a;
     }
 }
@@ -543,7 +631,7 @@ class Lortnoc_ContainerTest_Delta
 {
     public $a;
     public $b;
-    public function __constructor($a, $b) {
+    public function __construct($a, $b) {
         $this->a = $a;
         $this->b = $b;
     }
@@ -558,10 +646,44 @@ class Lortnoc_ContainerTest_Epsilon
     public $a;
     public $b;
     public $c;
-    public function __constructor($a, $b, $c) {
+    public function __construct($a, $b, $c) {
         $this->a = $a;
         $this->b = $b;
         $this->c = $c;
     }
 }
 
+/**
+ * Helper inner class.
+ *
+ */
+class Lortnoc_ContainerTest_Zeta
+{
+    public $a;
+    public $b;
+    public $c;
+    public static function create($a, $b, $c) {
+        $class = get_called_class();
+        return new $class($a, $b, $c);
+    }
+    public function __construct($a=1, $b=2, $c=3) {
+        $this->a = $a;
+        $this->b = $b;
+        $this->c = $c;
+    }
+    public function make() {
+        $class = get_called_class();
+        return new $class($this->a, $this->b, $this->c);
+    }
+}
+
+/**
+ * Helper factory function.
+ * 
+ * @param mixed $a
+ * @param mixed $b
+ * @param mixed $c
+ */
+function _testFactoryFunction($a=1, $b=2, $c=3) {
+    return new Lortnoc_ContainerTest_Zeta($a, $b, $c);
+}
