@@ -299,6 +299,29 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Lortnoc_Container::clear
+     */
+    public function testClear() {
+        $components = array(
+            'beta1' => array(
+                'class' => 'Lortnoc_ContainerTest_Beta',
+            ),
+            'beta2' => array(
+                'class' => 'Lortnoc_ContainerTest_Beta',
+            ),
+        );
+        $container = new Lortnoc_Container($components);
+        $beta1 = $container->getComponent('beta1');
+        $beta1->name = '1';
+        $beta2 = $container->getComponent('beta2');
+        $beta2->name = '2';
+        $retval = $container->clear();
+        $this->assertNotSame($beta1, $container->getComponent('beta1'));
+        $this->assertNotSame($beta2, $container->getComponent('beta2'));
+        $this->assertSame($container, $retval);
+    }
+    
+    /**
      * @covers Lortnoc_Container::__get
      * @covers Lortnoc_Container::__set
      * @covers Lortnoc_Container::__isset

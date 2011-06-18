@@ -224,6 +224,7 @@ class Lortnoc_Container
      * 
      * @param string $name
      * @param mixed $instance
+     * @return Lortnoc_Container
      */
     public function setComponent($name, $instance) {
         $this->instances[$name] = $instance;
@@ -248,9 +249,21 @@ class Lortnoc_Container
      * instance is created the next time it is retrieved.
      * 
      * @param string $name
+     * @return Lortnoc_Container
      */
     public function clearComponent($name) {
         unset($this->instances[$name]);
+        return $this;
+    }
+    
+    /**
+     * Removes all components from the container cache so that new instances
+     * are created when retrieved again.
+     * 
+     * @return Lortnoc_Container
+     */
+    public function clear() {
+        $this->instances = array();
         return $this;
     }
 
