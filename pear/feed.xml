@@ -6,5 +6,16 @@
         <name>http://scoffey.github.com/lortnoc/pear</name>
     </author>
 
-
+    <entry>
+        <title>Lortnoc 0.1.0 (beta)</title>
+        <link href="http://scoffey.github.com/lortnoc/pear/get/Lortnoc-0.1.0.tgz" />
+        <id>Lortnoc-0.1.0</id>
+        <author>
+            <name>scoffey</name>
+        </author>
+        <updated>2011-06-18T19:38:30-03:00</updated>
+        <content>
+            A simple inversion of control framework for PHP.
+        </content>
+    </entry>
 </feed>

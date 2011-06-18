@@ -1,4 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <f xmlns="http://pear.php.net/dtd/rest.categorypackageinfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://pear.php.net/dtd/rest.categorypackageinfo     http://pear.php.net/dtd/rest.categorypackageinfo.xsd">
+    <pi>
+        <p>
+            <n>Lortnoc</n>
+            <c>scoffey.github.com/lortnoc/pear</c>
+            <ca xlink:href="/rest/c/Default">Default</ca>
+            <l>MIT</l>
+            <s>A simple inversion of control framework for PHP</s>
+            <d>A simple inversion of control framework for PHP.</d>
+            <r xlink:href="/rest/r/lortnoc" />
+        </p>
 
+        <a>
+            <r>
+                <v>0.1.0</v>
+                <s>beta</s>
+            </r>
+
+        </a>
+
+        <deps>
+            <v>0.1.0</v>
+            <d>a:1:{s:8:"required";a:2:{s:3:"php";a:1:{s:3:"min";s:5:"5.3.0";}s:13:"pearinstaller";a:1:{s:3:"min";s:5:"1.4.0";}}}</d>
+        </deps>
+
+    </pi>
 </f>
