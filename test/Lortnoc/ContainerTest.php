@@ -189,6 +189,19 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Lortnoc_Container::requireConfigParam
+     */
+    public function testRequireConfigParam() {
+        $params = array('foo' => 'bar', 'baz' => 42);
+        $container = new Lortnoc_Container(array(), $params);
+        $this->assertEquals('bar', $container->requireConfigParam('foo'));
+        $this->assertEquals(42, $container->requireConfigParam('baz'));
+        $this->setExpectedException('Lortnoc_Exception_NotFound',
+                'Configuration parameter key not found: quux');
+        $container->requireConfigParam('quux');
+    }
+    
+    /**
      * @covers Lortnoc_Container::getComponents
      */
     public function testGetComponents() {
@@ -334,7 +347,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     /**
      * @covers Lortnoc_Container::getInstance
      */
-    public function testGetComponentThrowingNotFoundException() {
+    public function testGetComponentThrowingComponentNotFoundException() {
         $components = array(
             'Lortnoc_ContainerTest_Beta' => array(
                 'class' => 'Lortnoc_ContainerTest_Beta',
@@ -345,6 +358,22 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
                 'Component not found in container: '
                 . '"Lortnoc_ContainerTest_Alpha"');
         $instance = $container->getComponent('Lortnoc_ContainerTest_Alpha');
+    }
+    
+    /**
+     * @covers Lortnoc_Container::getInstance
+     */
+    public function testGetComponentThrowingConfigParamNotFoundException() {
+        $components = array(
+            'Lortnoc_ContainerTest_Epsilon' => array(
+                'class' => 'Lortnoc_ContainerTest_Epsilon',
+                'arguments' => array('quux', 42, '%foo'),
+            ),
+        );
+        $container = new Lortnoc_Container($components);
+        $this->setExpectedException('Lortnoc_Exception_NotFound',
+                'Configuration parameter key not found: foo');
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Epsilon');
     }
     
     /**
@@ -437,7 +466,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
      * @covers Lortnoc_Container::createFromFactory
      */
     public function testGetComponentCreatedFromFactory() {
-    	$instance = new Lortnoc_ContainerTest_Zeta(14, 15, 16);
+        $instance = new Lortnoc_ContainerTest_Zeta(14, 15, 16);
         $components = array(
             'byClassMethod' => array(
                 'factory' => array('Lortnoc_ContainerTest_Zeta', 'create'),
@@ -477,7 +506,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
      * @covers Lortnoc_Container::createFromFactory
      */
     public function testGetComponentCreatedFromNonCallableFactory() {
-    	$badFactory = array('Lortnoc_ContainerTest_Zeta', 'create', 'x');
+        $badFactory = array('Lortnoc_ContainerTest_Zeta', 'create', 'x');
         $components = array(
             'Lortnoc_ContainerTest_Zeta' => array(
                 'factory' => $badFactory,
@@ -509,7 +538,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
      * @covers Lortnoc_Container::createFromClass
      */
     public function testGetComponentCreatedFromClass() {
-    	// Also tests exception thrown when class is not found
+        // Also tests exception thrown when class is not found
         $components = array(
             'Lortnoc_ContainerTest_Epsilon' => array(
                 'class' => 'Lortnoc_ContainerTest_Epsilon',
@@ -548,8 +577,8 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
      * @covers Lortnoc_Container::create
      */
     public function testGetComponentWithPropertiesSet() {
-    	$params = array('spam' => 'eggs');
-    	$properties = array('a' => 'foo', 'b' => '%spam', 'c' => '@delta');
+        $params = array('spam' => 'eggs');
+        $properties = array('a' => 'foo', 'b' => '%spam', 'c' => '@delta');
         $components = array(
             'delta' => array(
                 'class' => 'Lortnoc_ContainerTest_Delta',
@@ -572,7 +601,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
      * @covers Lortnoc_Container::callMethod
      */
     public function testGetComponentWithMethodCalls() {
-    	$params = array('foo' => 3);
+        $params = array('foo' => 3);
         $components = array(
             'bar' => array(
                 'class' => 'Lortnoc_ContainerTest_Delta',

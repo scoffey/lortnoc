@@ -137,8 +137,8 @@ class Lortnoc_Container
                 $name = substr($object, 1);
                 return ($name[0] == '@' ? $name : $this->getInstance($name));
             } else if ($specialchar == '%') {
-                $key = substr($object, 1);
-                return ($key[0] == '%' ? $key : $this->getConfigParam($key));
+                $k = substr($object, 1);
+                return ($k[0] == '%' ? $k : $this->requireConfigParam($k));
             }
         } else if (is_array($object)) {
             return array_map(array($this, 'dereference'), $object);
@@ -156,7 +156,8 @@ class Lortnoc_Container
     }
 
     /**
-     * Gets a configuration parameter by key.
+     * Gets a configuration parameter by key (or else falls back to a
+     * default value if not found).
      * 
      * @param string $key
      * @param mixed $default
@@ -177,6 +178,22 @@ class Lortnoc_Container
     public function setConfigParam($key, $value) {
         $this->params[$key] = $value;
         return $this;
+    }
+    
+    /**
+     * Gets a configuration parameter by key (but throws an exception
+     * if key is not found).
+     * 
+     * @param string $key
+     * @throws Lortnoc_Exception_NotFound
+     * @return mixed
+     */
+    public function requireConfigParam($key) {
+        if (!array_key_exists($key, $this->params)) {
+            throw new Lortnoc_Exception_NotFound(
+                    'Configuration parameter key not found: ' . $key);
+        }
+        return $this->params[$key];
     }
 
     /**
