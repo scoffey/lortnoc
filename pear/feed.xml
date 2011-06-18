@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://scoffey.github.com/lortnoc">
+<feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://scoffey.github.com/lortnoc/pear">
     <title>Lortnoc PEAR channel Latest Releases</title>
-    <link href="http://scoffey.github.com/lortnoc" />
+    <link href="http://scoffey.github.com/lortnoc/pear" />
     <author>
-        <name>http://scoffey.github.com/lortnoc</name>
+        <name>http://scoffey.github.com/lortnoc/pear</name>
     </author>
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <server>
-<name>scoffey.github.com/lortnoc</name>
+<name>scoffey.github.com/lortnoc/pear</name>
 <summary>Lortnoc PEAR channel</summary>
 <alias>lortnoc</alias>
-<url>http://scoffey.github.com/lortnoc</url>
+<url>http://scoffey.github.com/lortnoc/pear</url>
 </server>
