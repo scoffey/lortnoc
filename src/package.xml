@@ -16,7 +16,6 @@
   <active>yes</active>
  </lead>
  <date>2011-06-18</date>
- <time>16:00:00</time>
  <version>
   <release>0.1.0</release>
   <api>0.1.0</api>
@@ -48,18 +47,9 @@ THE SOFTWARE.
  </notes>
  <contents>
    <dir name="/">
-    <file name="LICENSE.txt" role="doc" />
-    <file name="README.markdown" role="doc" />
-    <dir name="src">
-      <dir name="Lortnoc">
-        <file name="Container.php" role="php" />
-        <file name="Exception.php" role="php" />
-      </dir>
-    </dir>
-    <dir name="test">
-      <dir name="Lortnoc">
-        <file name="ContainerTest.php" role="test" />
-      </dir>
+    <dir name="Lortnoc">
+      <file name="Container.php" role="php" />
+      <file name="Exception.php" role="php" />
     </dir>
    </dir>
  </contents>
