@@ -426,7 +426,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Lortnoc_Container::getInstance
+     * @covers Lortnoc_Container::getComponentConfiguration
      */
     public function testGetComponentThrowingConfigErrorIfNotArray() {
         // Also tests other possible configuration types (NULL and string)
@@ -486,6 +486,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Lortnoc_Container::create
      * @covers Lortnoc_Container::createFromFactory
      */
     public function testGetComponentCreatedFromFactory() {
@@ -526,6 +527,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Lortnoc_Container::create
      * @covers Lortnoc_Container::createFromFactory
      */
     public function testGetComponentCreatedFromNonCallableFactory() {
@@ -543,6 +545,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Lortnoc_Container::create
      * @covers Lortnoc_Container::createFromFactory
      */
     public function testGetComponentCreatedFromFactoryWithBadArguments() {
@@ -558,6 +561,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Lortnoc_Container::create
      * @covers Lortnoc_Container::createFromClass
      */
     public function testGetComponentCreatedFromClass() {
@@ -582,6 +586,25 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Lortnoc_Container::create
+     * @covers Lortnoc_Container::createFromClass
+     */
+    public function testGetComponentCreatedFromClassWithReflectionError() {
+        $components = array(
+            'Lortnoc_ContainerTest_Eta' => array(
+                'class' => 'Lortnoc_ContainerTest_Eta',
+            ),
+        );
+        $container = new Lortnoc_Container($components);
+        $this->setExpectedException('Lortnoc_Exception_ReflectionError',
+                'Cannot create instance by reflection: '
+                . 'Access to non-public constructor of class '
+                . 'Lortnoc_ContainerTest_Eta');
+        $instance = $container->getComponent('Lortnoc_ContainerTest_Eta');
+    }
+    
+    /**
+     * @covers Lortnoc_Container::create
      * @covers Lortnoc_Container::createFromClass
      */
     public function testGetComponentCreatedFromClassWithBadArguments() {
@@ -621,6 +644,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Lortnoc_Container::create
      * @covers Lortnoc_Container::callMethod
      */
     public function testGetComponentWithMethodCalls() {
@@ -650,6 +674,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Lortnoc_Container::create
      * @covers Lortnoc_Container::callMethod
      */
     public function testGetComponentWithMethodCallsThrowingConfigError() {
@@ -669,6 +694,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Lortnoc_Container::create
      * @covers Lortnoc_Container::callMethod
      */
     public function testGetComponentWithMethodCallsThrowingReflectionError() {
@@ -689,6 +715,7 @@ class Lortnoc_ContainerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Lortnoc_Container::create
      * @covers Lortnoc_Container::callMethod
      */
     public function testGetComponentWithMethodCallsWithBadArguments() {
@@ -794,6 +821,16 @@ class Lortnoc_ContainerTest_Zeta
     }
     public function append($item) {
         $this->a[] = $item;
+    }
+}
+
+/**
+ * Helper inner class.
+ *
+ */
+class Lortnoc_ContainerTest_Eta
+{
+    private function __construct() {
     }
 }
 
