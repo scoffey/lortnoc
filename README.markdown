@@ -10,7 +10,7 @@ What is inversion of control?
 
 Dependency injection eliminates the need to hard-code component implementations with creational code inside methods (that is, statements that create new instances). In this way, instead of instantiating a particular implementation of a dependent component, the main component only needs to provide a way to inject it, for example via the constructor or a setter method (no need to implement interfaces or depend upon the DI container). The implementation of the dependent component can then be changed seamlessly in the component dependency configuration of the application.
 
-In order to separate behavior from configuration too, the `Lortnoc_Container` also supports configuration parameters to be passed to the DI container. By decoupling both dependency resolution and configuration from component behavior, it encourages optimal configurability, modularity and reusability of components.
+In order to separate behavior from configuration too, the Lortnoc framework also supports configuration parameters to be passed to the DI container. By decoupling both dependency resolution and configuration from component behavior, it encourages optimal configurability, modularity and reusability of components.
 
 For an in-depth explanation, read Martin Fowler's article on [Inversion of Control Containers and the Dependency Injection pattern][3].
 
@@ -142,16 +142,16 @@ Include an array in the `'methods'` key of the component configuration. Each ele
 - Which is the default value for each component configuration key?
     - `'class'`: when not present, class name is assumed to be the same as the component name (i.e., the component map key).
     - `'factory'`: when not present, creation by class name is assumed. (Precedence note: `'class'` is ignored when `'factory'` is present.)
-    - `'alias'`: has more precedence than the other keys; it just doesn't make a component alias if not present.
+    - `'alias'`: when not present, it just doesn't make a component alias. (Precedence note: has more precedence than the other keys.)
     - `'scope'`: defaults to `'singleton'`.
-    - `'arguments'`: an empty list; i.e., no arguments. This applies to constructors, factory methods or functions and method calls.
-    - `'properties'`: an empty map; i.e., no properties to be set.
-    - `'methods'`: an empty list; i.e., no methods to be called.
+    - `'arguments'`: defaults to an empty list; i.e., no arguments. This applies to constructors, factory methods or functions and method calls.
+    - `'properties'`: defaults to an empty map; i.e., no properties to be set.
+    - `'methods'`: defaults to an empty list; i.e., no methods to be called.
 
 Roadmap
 -------
 
-Any feedback on why it's important to have some feature or not is welcome! And will help me set the priorities on this roadmap.
+Any feedback on why it's important to have some feature or not is welcome! And will help me set priorities for future development.
 
 Planned features:
 
@@ -161,11 +161,11 @@ Planned features:
 
 - Take arguments literally, without dereference (finalargs): This would eliminate the need to escape argument lists when it is clear that no references are used.
 
-- Builder that provides fluent interface to configure Container: This would be useful to generate configurations on runtime by chaining method calls in a readable form.
+- Builder that provides fluent interface to configure container: This would be useful to generate configurations on runtime by chaining method calls in a readable form.
 
 - Auto-configuration via annotations: This would help to minimize component configuration.
 
-- Session scope using a Zend_Session_Namespace: This would allow the container to save state across a session, as in many DI frameworks used for web development.
+- Session scope using a `Zend_Session_Namespace`: This would allow the container to save state across a session, as in many DI frameworks used for web development.
 
 Other discarded or low priority ideas:
 
@@ -173,9 +173,9 @@ Other discarded or low priority ideas:
 
 - Preload all singletons, without lazy instantiation: This might be useful for validation, but it is already possible by iterating on the configured components and getting every instance. 
 
-- Implement IteratorAggregate to iterate on component instances: This behavior overloading might be confusing in a DI container.
+- Implement `IteratorAggregate` to iterate on component instances: This behavior overloading might be confusing in a DI container.
 
-- Implement arrayaccess to access configuration parameters: This behavior overloading might be confusing in a DI container.
+- Implement `arrayaccess` to access configuration parameters: This behavior overloading might be confusing in a DI container.
 
 - Hooks before/after instance created, properties set and methods called: This adds a lot of complexity to the container that could be solved with proper factory methods.
 
